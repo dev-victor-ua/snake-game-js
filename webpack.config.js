@@ -1,4 +1,5 @@
 const webpack = require('webpack');
+const ESLintPlugin = require('eslint-webpack-plugin');
 const path = require('path');
 
 const config = {
@@ -11,9 +12,13 @@ const config = {
     static: {
         directory: path.join(__dirname, 'public')
     },
+    client: {
+      overlay: false,
+    },
     compress: true,
     port: 5342
   },
+  plugins: [new ESLintPlugin({fix: true})],
 };
 
 module.exports = config;

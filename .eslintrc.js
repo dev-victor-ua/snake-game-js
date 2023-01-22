@@ -1,5 +1,7 @@
 module.exports = {
-    "rules": {},
+    "rules": {
+      "no-unused-vars": 1
+    },
     "env": {
         "es6": true,
         "browser": true

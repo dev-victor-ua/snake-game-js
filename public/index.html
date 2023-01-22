@@ -2,9 +2,20 @@
 <html lang="en">
     <head>
         <title>Snake game</title>
-        <script src="bundle.js"></script>
+        <style>
+            #game {
+                display: flex;
+                justify-content: center;
+            }
+
+            canvas {
+                border: 1px solid rgb(194, 194, 194);
+            }
+        </style>
     </head>
     <body>
-        <canvas width="400" height="400"></canvas>
+        <div id="game"></div>
+
+        <script src="bundle.js"></script>
     </body>
 </html>
