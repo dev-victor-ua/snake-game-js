@@ -1,4 +1,4 @@
-import initGame from './snake';
+import { initGame } from './snake';
 
 initGame();
 

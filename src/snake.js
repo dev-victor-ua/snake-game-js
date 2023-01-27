@@ -1,6 +1,7 @@
 import config from './config';
 import { Direction } from './enums';
 import vector from './vector';
+import { random, checkCollision } from './utils';
 
 // Game state
 const state = {
@@ -8,9 +9,13 @@ const state = {
   ctx: null,
   snake: {
     size: config.snake.size,
-    oldDirection: Direction.RIGHT,
     direction: Direction.RIGHT,
     segments: [],
+  },
+  food: {
+    pos: [0, 0],
+    size: config.food.size,
+    color: config.food.color,
   },
   score: 0,
 };
@@ -19,6 +24,7 @@ const state = {
 window.vector = vector;
 window.state = state;
 window.growSnake = growSnake;
+window.detectCollision = detectCollision;
 
 function _getSize(v) {
   return v.map((value) => {
@@ -54,6 +60,8 @@ function _getAddendPos() {
   return [0, 0];
 }
 
+function feedSnake() {}
+
 /**
  * Increase score.
  */
@@ -65,12 +73,17 @@ function addScore(score) {}
 function growSnake() {
   let lastSegment = {
     pos: [0, 0],
+    color: '#000',
+    size: config.snake.size,
   };
   const segments = state.snake.segments;
+  const segmentLength = segments.length;
 
-  if (state.snake.segments.length > 0) {
-    lastSegment = Object.assign({}, segments[segments.length - 1]);
+  if (segmentLength > 0) {
+    lastSegment = Object.assign({}, segments[segmentLength - 1]);
   }
+
+  lastSegment.color = config.snake.color(segmentLength);
 
   segments.push(lastSegment);
 }
@@ -93,20 +106,36 @@ function moveSnake() {
   }
 }
 
+function detectCollision(unit, checkUnits) {
+  for (const checkUnit of checkUnits) {
+    if (checkUnit.pos) {
+      // Test
+    }
+  }
+
+  return false;
+}
+
+function changeFoodPos() {
+  const newPos = [
+    random(0, 100 - state.food.size[0]),
+    random(0, 100 - state.food.size[1]),
+  ];
+
+  state.food.pos = newPos;
+}
+
 function draw() {
   const snake = state.snake;
-  const segments = snake.segments;
+  const shapes = [state.food, ...snake.segments];
 
   state.ctx.clearRect(0, 0, state.canvas.width, state.canvas.height);
 
-  for (let i = 0; i < segments.length; i++) {
-    if (i > 0) {
-      state.ctx.fillStyle = config.snake.color;
-    } else {
-      state.ctx.fillStyle = '#000';
-    }
-    const pos = _getSize(segments[i].pos);
-    const size = _getSize(snake.size);
+  for (let i = 0; i < shapes.length; i++) {
+    const pos = _getSize(shapes[i].pos);
+    const size = _getSize(shapes[i].size);
+
+    state.ctx.fillStyle = shapes[i].color;
     state.ctx.fillRect(pos[0], pos[1], size[0], size[1]);
   }
 
@@ -140,6 +169,8 @@ function initSnake() {
     }
   }
 
+  changeFoodPos();
+
   requestAnimationFrame(draw);
 }
 
@@ -159,4 +190,4 @@ window.addEventListener('keydown', (e) => {
   }
 });
 
-export default initGame;
+export { detectCollision, initGame };

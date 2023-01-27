@@ -19,6 +19,15 @@ const config = {
     port: 5342
   },
   plugins: [new ESLintPlugin({fix: true})],
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        use: 'babel-loader',
+        exclude: /node_modules/
+      }
+    ]
+  }
 };
 
 module.exports = config;
