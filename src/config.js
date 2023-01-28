@@ -10,7 +10,7 @@ const defaultConfig = {
   },
   // Snake properties.
   snake: {
-    speed: 0.5,
+    speed: 100,
     // A color of each segment.
     color: (i) => (i <= 0 ? '#000' : '#228b22'),
     // Segment size.

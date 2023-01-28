@@ -238,24 +238,37 @@ function initDraw() {
   requestAnimationFrame(draw);
 }
 
+function initControls() {
+  let newDirection = Direction.NONE;
+
+  window.addEventListener('keydown', (e) => {
+    const keyMaps = config.keyMaps;
+    if (e.key in keyMaps.movement) {
+      const d = keyMaps.movement[e.key];
+      if (isDirectionAllowed(d) && newDirection === Direction.NONE) {
+        newDirection = d;
+      }
+    }
+  });
+
+  setInterval(() => {
+    if (newDirection !== Direction.NONE) {
+      state.snake.direction = newDirection;
+      newDirection = Direction.NONE;
+    }
+
+    moveSnake();
+  }, config.snake.speed);
+}
+
 function initGame() {
   initState();
+  initControls();
   initCanvas();
   initSnake();
   initDraw();
 
   defineDev();
 }
-
-window.addEventListener('keydown', (e) => {
-  const keyMaps = config.keyMaps;
-  if (e.key in keyMaps.movement) {
-    const newDirection = keyMaps.movement[e.key];
-    if (isDirectionAllowed(newDirection)) {
-      state.snake.direction = newDirection;
-      moveSnake();
-    }
-  }
-});
 
 export { detectCollision, initGame };

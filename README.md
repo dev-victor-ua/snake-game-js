@@ -1,5 +1,5 @@
 # Simple snake game
 
-- Run `npm run serve`
+Run `npm run serve`
 
 TODO:
