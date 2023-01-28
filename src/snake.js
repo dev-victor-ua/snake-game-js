@@ -1,3 +1,4 @@
+import process from 'process';
 import config from './config';
 import { Direction } from './enums';
 import vector from './vector';
@@ -11,6 +12,7 @@ const state = {
     size: config.snake.size,
     direction: Direction.RIGHT,
     segments: [],
+    head: null,
   },
   food: {
     pos: [0, 0],
@@ -20,11 +22,7 @@ const state = {
   score: 0,
 };
 
-// TODO: Remove.
-window.vector = vector;
-window.state = state;
-window.growSnake = growSnake;
-window.detectCollision = detectCollision;
+defineDev();
 
 function _getSize(v) {
   return v.map((value) => {
@@ -60,7 +58,14 @@ function _getAddendPos() {
   return [0, 0];
 }
 
-function feedSnake() {}
+function feedSnake() {
+  if (!checkCollision(state.snake.head, state.food)) {
+    return;
+  }
+
+  growSnake();
+  changeFoodPos();
+}
 
 /**
  * Increase score.
@@ -88,28 +93,51 @@ function growSnake() {
   segments.push(lastSegment);
 }
 
+function adjustPos(shape) {
+  const pos = shape.pos;
+
+  if (pos[0] >= 100) {
+    shape.pos = [0, pos[1]];
+  } else if (pos[0] < 0) {
+    shape.pos = [100 - shape.size[0], pos[1]];
+  } else if (pos[1] >= 100) {
+    shape.pos = [pos[0], 0];
+  } else if (pos[1] < 0) {
+    shape.pos = [pos[0], 100 - shape.size[1]];
+  }
+
+  return pos;
+}
+
 /**
  * Snake movement.
  */
-function moveSnake() {
+function moveSnake(feed_snake = true) {
   const segments = state.snake.segments;
 
   for (let i = 0, prevSegment = null; i < segments.length; i++) {
     const segmentCopy = Object.assign({}, segments[i]);
     if (i <= 0) {
       segments[i].pos = vector.add(segments[i].pos, _getAddendPos());
+      adjustPos(segments[i]);
     } else {
       segments[i].pos = prevSegment.pos;
     }
 
     prevSegment = segmentCopy;
   }
+
+  state.snake.head = state.snake.segments[0];
+
+  if (feed_snake) {
+    feedSnake();
+  }
 }
 
 function detectCollision(unit, checkUnits) {
   for (const checkUnit of checkUnits) {
-    if (checkUnit.pos) {
-      // Test
+    if (checkCollision(unit, checkUnit)) {
+      return true;
     }
   }
 
@@ -117,12 +145,14 @@ function detectCollision(unit, checkUnits) {
 }
 
 function changeFoodPos() {
-  const newPos = [
+  state.food.pos = [
     random(0, 100 - state.food.size[0]),
     random(0, 100 - state.food.size[1]),
   ];
 
-  state.food.pos = newPos;
+  if (detectCollision(state.food, state.snake.segments)) {
+    changeFoodPos();
+  }
 }
 
 function draw() {
@@ -140,6 +170,23 @@ function draw() {
   }
 
   requestAnimationFrame(draw);
+}
+
+/**
+ * Expose variables and functions for non-production environment.
+ *
+ * @returns
+ */
+function defineDev() {
+  if (process.env.NODE_ENV === 'production') {
+    return;
+  }
+
+  window.vector = vector;
+  window.state = state;
+  window.growSnake = growSnake;
+  window.detectCollision = detectCollision;
+  window.checkCollision = checkCollision;
 }
 
 /**
@@ -165,7 +212,7 @@ function initSnake() {
   for (let i = 0; i < config.snake.minSegments; i++) {
     growSnake();
     if (i > 0) {
-      moveSnake();
+      moveSnake(false);
     }
   }
 
