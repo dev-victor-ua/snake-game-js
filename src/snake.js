@@ -2,7 +2,7 @@ import process from 'process';
 import config from './config';
 import { Direction } from './enums';
 import vector from './vector';
-import { random, checkCollision } from './utils';
+import { random, checkCollision, adjustPos } from './utils';
 
 // Game state
 const state = {
@@ -91,22 +91,6 @@ function growSnake() {
   lastSegment.color = config.snake.color(segmentLength);
 
   segments.push(lastSegment);
-}
-
-function adjustPos(shape) {
-  const pos = shape.pos;
-
-  if (pos[0] >= 100) {
-    shape.pos = [0, pos[1]];
-  } else if (pos[0] < 0) {
-    shape.pos = [100 - shape.size[0], pos[1]];
-  } else if (pos[1] >= 100) {
-    shape.pos = [pos[0], 0];
-  } else if (pos[1] < 0) {
-    shape.pos = [pos[0], 100 - shape.size[1]];
-  }
-
-  return pos;
 }
 
 /**
