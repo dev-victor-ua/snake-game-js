@@ -65,12 +65,16 @@ function feedSnake() {
 
   growSnake();
   changeFoodPos();
+
+  addScore(config.score);
 }
 
 /**
  * Increase score.
  */
-function addScore(score) {}
+function addScore(score) {
+  state.score += score;
+}
 
 /**
  * Add a new segment to the tail of a snake.

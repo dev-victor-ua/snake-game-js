@@ -16,7 +16,7 @@ const defaultConfig = {
     // Segment size.
     size: [4, 4],
     // A minimum number of segments. If set 1, the snake starts without a tail.
-    minSegments: 15,
+    minSegments: 2,
     startPos: [0, 0],
   },
   food: {
