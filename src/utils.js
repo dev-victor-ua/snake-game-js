@@ -7,10 +7,10 @@
  */
 function checkCollision(s1, s2) {
   return (
-    s1.pos[0] + s1.size[0] >= s2.pos[0] &&
-    s1.pos[0] <= s2.pos[0] + s2.size[0] &&
-    s1.pos[1] + s1.size[1] >= s2.pos[1] &&
-    s1.pos[1] <= s2.pos[1] + s2.size[1]
+    s1.pos[0] + s1.size[0] > s2.pos[0] &&
+    s1.pos[0] < s2.pos[0] + s2.size[0] &&
+    s1.pos[1] + s1.size[1] > s2.pos[1] &&
+    s1.pos[1] < s2.pos[1] + s2.size[1]
   );
 }
 

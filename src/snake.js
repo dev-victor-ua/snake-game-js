@@ -4,30 +4,42 @@ import { Direction } from './enums';
 import vector from './vector';
 import { random, checkCollision, adjustPos } from './utils';
 
-// Game state
-const state = {
-  canvas: null,
+const canvas = {
+  elm: null,
   ctx: null,
-  snake: {
-    size: config.snake.size,
-    direction: Direction.RIGHT,
-    segments: [],
-    head: null,
-  },
-  food: {
-    pos: [0, 0],
-    size: config.food.size,
-    color: config.food.color,
-  },
-  score: 0,
 };
-
-defineDev();
+// Game state
+let state = {};
 
 function _getSize(v) {
   return v.map((value) => {
-    return (state.canvas.width / 100) * value;
+    return (canvas.elm.width / 100) * value;
   });
+}
+
+function initState() {
+  const newState = {
+    snake: {
+      size: config.snake.size,
+      direction: Direction.RIGHT,
+      segments: [],
+      head: null,
+    },
+    food: {
+      pos: [0, 0],
+      size: config.food.size,
+      color: config.food.color,
+    },
+    obstacles: [],
+    score: 0,
+  };
+
+  // Clear the state and populate with properties from a new one.
+  for (let key in state) {
+    delete state[key];
+  }
+
+  Object.assign(state, newState);
 }
 
 function isDirectionAllowed(newDirection) {
@@ -116,10 +128,13 @@ function moveSnake(feed_snake = true) {
   }
 
   state.snake.head = state.snake.segments[0];
+  state.obstacles = state.snake.segments.slice(1);
 
   if (feed_snake) {
     feedSnake();
   }
+
+  watchGameState();
 }
 
 function detectCollision(unit, checkUnits) {
@@ -143,18 +158,30 @@ function changeFoodPos() {
   }
 }
 
+/**
+ * Check whether the game is over or not.
+ */
+function watchGameState() {
+  const head = state.snake.head;
+
+  if (detectCollision(head, state.obstacles)) {
+    initState();
+    initSnake();
+  }
+}
+
 function draw() {
   const snake = state.snake;
   const shapes = [state.food, ...snake.segments];
 
-  state.ctx.clearRect(0, 0, state.canvas.width, state.canvas.height);
+  canvas.ctx.clearRect(0, 0, canvas.elm.width, canvas.elm.height);
 
   for (let i = 0; i < shapes.length; i++) {
     const pos = _getSize(shapes[i].pos);
     const size = _getSize(shapes[i].size);
 
-    state.ctx.fillStyle = shapes[i].color;
-    state.ctx.fillRect(pos[0], pos[1], size[0], size[1]);
+    canvas.ctx.fillStyle = shapes[i].color;
+    canvas.ctx.fillRect(pos[0], pos[1], size[0], size[1]);
   }
 
   requestAnimationFrame(draw);
@@ -189,8 +216,8 @@ function initCanvas() {
 
   mountPoint.appendChild(newCanvas);
 
-  state.canvas = newCanvas;
-  state.ctx = state.canvas.getContext('2d');
+  canvas.elm = newCanvas;
+  canvas.ctx = canvas.elm.getContext('2d');
 }
 
 /**
@@ -205,13 +232,19 @@ function initSnake() {
   }
 
   changeFoodPos();
+}
 
+function initDraw() {
   requestAnimationFrame(draw);
 }
 
 function initGame() {
+  initState();
   initCanvas();
   initSnake();
+  initDraw();
+
+  defineDev();
 }
 
 window.addEventListener('keydown', (e) => {
