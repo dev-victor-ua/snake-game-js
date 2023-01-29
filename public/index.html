@@ -3,9 +3,15 @@
     <head>
         <title>Snake game</title>
         <style>
-            #game {
+            #box, #score {
                 display: flex;
                 justify-content: center;
+            }
+
+            #score, #score-table {
+                max-width: 400px;
+                margin: auto;
+                margin-bottom: 5px;
             }
 
             canvas {
@@ -14,7 +20,11 @@
         </style>
     </head>
     <body>
-        <div id="game"></div>
+        <div id="game">
+            <div id="score">Score: <span>0</span></div>
+            <div id="box"></div>
+            <div id="score-table"></div>
+        </div>
 
         <script src="bundle.js"></script>
     </body>

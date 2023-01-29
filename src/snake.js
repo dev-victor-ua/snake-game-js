@@ -4,16 +4,22 @@ import { Direction } from './enums';
 import vector from './vector';
 import { random, checkCollision, adjustPos } from './utils';
 
-const canvas = {
-  elm: null,
+// Game info
+const game = {
+  canvas: null,
   ctx: null,
+  score: {
+    results: [],
+    elm: null,
+    tableElm: null,
+  },
 };
 // Game state
 let state = {};
 
 function _getSize(v) {
   return v.map((value) => {
-    return (canvas.elm.width / 100) * value;
+    return (game.canvas.width / 100) * value;
   });
 }
 
@@ -82,10 +88,46 @@ function feedSnake() {
 }
 
 /**
+ * Reset game score.
+ *
+ * @param {Boolean} save Save to game score list.
+ */
+function resetScore(save = true) {
+  if (save) {
+    saveScore();
+  }
+
+  addScore(state.score * -1);
+}
+
+/**
+ * Save score to game info.
+ */
+function saveScore() {
+  game.score.results.push(state.score);
+
+  if (!game.score.tableElm) {
+    game.score.tableElm = document.querySelector('#score-table');
+  }
+
+  const p = document.createElement('p');
+  p.dataset.score = state.score;
+  p.textContent = state.score;
+
+  game.score.tableElm.appendChild(p);
+}
+
+/**
  * Increase score.
  */
 function addScore(score) {
   state.score += score;
+
+  if (!game.score.elm) {
+    game.score.elm = document.querySelector('#score > span');
+  }
+
+  game.score.elm.textContent = state.score;
 }
 
 /**
@@ -165,6 +207,7 @@ function watchGameState() {
   const head = state.snake.head;
 
   if (detectCollision(head, state.obstacles)) {
+    resetScore();
     initState();
     initSnake();
   }
@@ -174,14 +217,14 @@ function draw() {
   const snake = state.snake;
   const shapes = [state.food, ...snake.segments];
 
-  canvas.ctx.clearRect(0, 0, canvas.elm.width, canvas.elm.height);
+  game.ctx.clearRect(0, 0, game.canvas.width, game.canvas.height);
 
   for (let i = 0; i < shapes.length; i++) {
     const pos = _getSize(shapes[i].pos);
     const size = _getSize(shapes[i].size);
 
-    canvas.ctx.fillStyle = shapes[i].color;
-    canvas.ctx.fillRect(pos[0], pos[1], size[0], size[1]);
+    game.ctx.fillStyle = shapes[i].color;
+    game.ctx.fillRect(pos[0], pos[1], size[0], size[1]);
   }
 
   requestAnimationFrame(draw);
@@ -197,6 +240,7 @@ function defineDev() {
     return;
   }
 
+  window.game = game;
   window.vector = vector;
   window.state = state;
   window.growSnake = growSnake;
@@ -208,16 +252,18 @@ function defineDev() {
  * Init HTML canvas.
  */
 function initCanvas() {
-  const mountPoint = document.querySelector(config.canvas.mountPoint);
+  const box = document
+    .querySelector(config.canvas.mountPoint)
+    .querySelector('#box');
   const newCanvas = document.createElement('canvas');
 
   newCanvas.width = config.canvas.size[0];
   newCanvas.height = config.canvas.size[1];
 
-  mountPoint.appendChild(newCanvas);
+  box.appendChild(newCanvas);
 
-  canvas.elm = newCanvas;
-  canvas.ctx = canvas.elm.getContext('2d');
+  game.canvas = newCanvas;
+  game.ctx = game.canvas.getContext('2d');
 }
 
 /**
