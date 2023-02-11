@@ -11,8 +11,9 @@ const defaultConfig = {
   // Snake properties.
   snake: {
     speed: 100,
-    // A color of each segment.
-    color: (i) => (i <= 0 ? '#000' : '#228b22'),
+    // A color of segments.
+    color: '#228b22',
+    headColor: '#000',
     // Segment size.
     size: [4, 4],
     // A minimum number of segments. If set 1, the snake starts without a tail.

@@ -3,6 +3,7 @@ import config from './config';
 import { Direction } from './enums';
 import vector from './vector';
 import { random, checkCollision, adjustPos } from './utils';
+import { snakeSegment } from './resources';
 
 // Game info
 const game = {
@@ -134,19 +135,16 @@ function addScore(score) {
  * Add a new segment to the tail of a snake.
  */
 function growSnake() {
-  let lastSegment = {
-    pos: [0, 0],
-    color: '#000',
-    size: config.snake.size,
-  };
+  let lastSegment = snakeSegment();
   const segments = state.snake.segments;
   const segmentLength = segments.length;
 
   if (segmentLength > 0) {
     lastSegment = Object.assign({}, segments[segmentLength - 1]);
+    lastSegment.color = config.snake.color;
+  } else {
+    lastSegment.color = config.snake.headColor;
   }
-
-  lastSegment.color = config.snake.color(segmentLength);
 
   segments.push(lastSegment);
 }
@@ -154,29 +152,20 @@ function growSnake() {
 /**
  * Snake movement.
  */
-function moveSnake(feed_snake = true) {
-  const segments = state.snake.segments;
+function moveSnake() {
+  const prevHead = state.snake.segments[0];
+  const newHead = Object.assign(snakeSegment(), prevHead);
 
-  for (let i = 0, prevSegment = null; i < segments.length; i++) {
-    const segmentCopy = Object.assign({}, segments[i]);
-    if (i <= 0) {
-      segments[i].pos = vector.add(segments[i].pos, _getAddendPos());
-      adjustPos(segments[i]);
-    } else {
-      segments[i].pos = prevSegment.pos;
-    }
+  newHead.pos = vector.add(prevHead.pos, _getAddendPos());
+  adjustPos(newHead);
 
-    prevSegment = segmentCopy;
-  }
+  state.snake.segments[0].color = config.snake.color;
+  state.snake.segments = [newHead].concat(state.snake.segments);
 
-  state.snake.head = state.snake.segments[0];
+  state.snake.segments.pop();
+
+  state.snake.head = newHead;
   state.obstacles = state.snake.segments.slice(1);
-
-  if (feed_snake) {
-    feedSnake();
-  }
-
-  watchGameState();
 }
 
 function detectCollision(unit, checkUnits) {
@@ -272,9 +261,7 @@ function initCanvas() {
 function initSnake() {
   for (let i = 0; i < config.snake.minSegments; i++) {
     growSnake();
-    if (i > 0) {
-      moveSnake(false);
-    }
+    moveSnake();
   }
 
   changeFoodPos();
@@ -304,6 +291,8 @@ function initControls() {
     }
 
     moveSnake();
+    feedSnake();
+    watchGameState();
   }, config.snake.speed);
 }
 
