@@ -3,7 +3,8 @@ import config from './config';
 import { Direction } from './enums';
 import vector from './vector';
 import { random, checkCollision, adjustPos } from './utils';
-import { snakeSegment } from './resources';
+import { getShape } from './resources';
+import { getMap } from './maps';
 
 // Game info
 const game = {
@@ -37,6 +38,7 @@ function initState() {
       size: config.food.size,
       color: config.food.color,
     },
+    shapes: [],
     obstacles: [],
     score: 0,
   };
@@ -135,7 +137,7 @@ function addScore(score) {
  * Add a new segment to the tail of a snake.
  */
 function growSnake() {
-  let lastSegment = snakeSegment();
+  let lastSegment = getShape();
   const segments = state.snake.segments;
   const segmentLength = segments.length;
 
@@ -154,7 +156,7 @@ function growSnake() {
  */
 function moveSnake() {
   const prevHead = state.snake.segments[0];
-  const newHead = Object.assign(snakeSegment(), prevHead);
+  const newHead = Object.assign(getShape(), prevHead);
 
   newHead.pos = vector.add(prevHead.pos, _getAddendPos());
   adjustPos(newHead);
@@ -165,7 +167,12 @@ function moveSnake() {
   state.snake.segments.pop();
 
   state.snake.head = newHead;
-  state.obstacles = state.snake.segments.slice(1);
+
+  updateObstacles();
+}
+
+function updateObstacles() {
+  state.obstacles = [...state.snake.segments.slice(1), ...state.shapes];
 }
 
 function detectCollision(unit, checkUnits) {
@@ -184,7 +191,10 @@ function changeFoodPos() {
     random(0, 100 - state.food.size[1]),
   ];
 
-  if (detectCollision(state.food, state.snake.segments)) {
+  if (
+    checkCollision(state.food, state.snake.head) ||
+    detectCollision(state.food, state.obstacles)
+  ) {
     changeFoodPos();
   }
 }
@@ -204,7 +214,7 @@ function watchGameState() {
 
 function draw() {
   const snake = state.snake;
-  const shapes = [state.food, ...snake.segments];
+  const shapes = [state.food, ...snake.segments, ...state.shapes];
 
   game.ctx.clearRect(0, 0, game.canvas.width, game.canvas.height);
 
@@ -258,7 +268,9 @@ function initCanvas() {
 /**
  * Initialize snake game.
  */
-function initSnake() {
+async function initSnake() {
+  await initMap();
+
   for (let i = 0; i < config.snake.minSegments; i++) {
     growSnake();
     moveSnake();
@@ -296,11 +308,15 @@ function initControls() {
   }, config.snake.speed);
 }
 
-function initGame() {
+async function initMap() {
+  state.shapes = await getMap('map01');
+}
+
+async function initGame() {
   initState();
-  initControls();
   initCanvas();
-  initSnake();
+  await initSnake();
+  initControls();
   initDraw();
 
   defineDev();

@@ -32,6 +32,7 @@ const defaultConfig = {
       ArrowRight: Direction.RIGHT,
     },
   },
+  defaultMap: 'map01',
   // The score that given for each food eaten.
   score: 5,
 };

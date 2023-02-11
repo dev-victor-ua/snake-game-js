@@ -3,7 +3,7 @@ import config from './config';
 /**
  * @returns {Segment}
  */
-function snakeSegment() {
+function getShape() {
   return {
     pos: [0, 0],
     color: config.snake.color,
@@ -11,4 +11,4 @@ function snakeSegment() {
   };
 }
 
-export { snakeSegment };
+export { getShape };
