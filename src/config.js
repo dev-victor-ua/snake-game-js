@@ -1,5 +1,4 @@
 import { Direction } from './enums';
-import { random } from './utils';
 
 const defaultConfig = {
   canvas: {
