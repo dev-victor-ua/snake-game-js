@@ -1,5 +1,7 @@
+type Vector2D = [number, number];
+
 interface Shape {
-    pos: Array<number>,
+    pos: Vector2D,
     color: string,
-    size: Array<number>
-}
+    size: Vector2D
+};

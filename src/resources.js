@@ -1,7 +1,7 @@
 import config from './config';
 
 /**
- * @returns {Segment}
+ * @returns {Shape}
  */
 function getShape() {
   return {
