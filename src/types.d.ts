@@ -4,4 +4,4 @@ interface Shape {
     pos: Vector2D,
     color: string,
     size: Vector2D
-};
+}
