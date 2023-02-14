@@ -1,23 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>Snake game</title>
-        <style>
-            #box, #score {
-                display: flex;
-                justify-content: center;
-            }
-
-            #score, #score-table {
-                max-width: 400px;
-                margin: auto;
-                margin-bottom: 5px;
-            }
-
-            canvas {
-                border: 1px solid rgb(194, 194, 194);
-            }
-        </style>
+        <title><%= htmlWebpackPlugin.options.title %></title>
     </head>
     <body>
         <div id="game">
@@ -25,7 +9,5 @@
             <div id="box"></div>
             <div id="score-table"></div>
         </div>
-
-        <script src="bundle.js"></script>
     </body>
 </html>
