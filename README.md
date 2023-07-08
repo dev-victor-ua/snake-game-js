@@ -1,6 +1,6 @@
 # Simple snake game
 
-Just another snake game made for... just because.
+Just another snake game made for learning purposes.
 
 ## Requirements
 
